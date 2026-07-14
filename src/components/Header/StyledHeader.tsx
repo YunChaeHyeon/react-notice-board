@@ -5,11 +5,15 @@ const StyledHeader = styled.header`
   position: fixed;
   z-index: 999;
   top: 0;
-  padding: 0 24px; // 임의
+  left: 0;
+  padding: 0 24px;
   width: 100vw;
   height: ${HEADER_HEIGHT}px;
   display: flex;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.12);
+  backdrop-filter: blur(16px);
 `;
 
 const StyledNav = styled.nav`
@@ -23,23 +27,35 @@ const StyledNav = styled.nav`
 
 const StyledUl = styled.ul`
   display: flex;
-  gap: 60px;
+  gap: 12px;
 `;
 
 const StyledLi = styled.li`
-  font-size: 22px;
-  font-weight: 400;
-  color: #121212;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3a8a;
+
+  a {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  a:hover {
+    color: #ffffff;
+    background: #2563eb;
+  }
 `;
 
-const StyledLink = styled.a``;
-
 const StyledLogo = styled.h1`
-  font-size: 30px;
-  font-weight: 600;
-  color: #121212;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1d4ed8;
 `;
 
 export default StyledHeader;
 
-export { StyledNav, StyledLi, StyledLink, StyledUl, StyledLogo };
+export { StyledNav, StyledLi, StyledUl, StyledLogo };
