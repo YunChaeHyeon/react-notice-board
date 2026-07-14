@@ -79,6 +79,16 @@ export const StyledLogin = styled.main`
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
   }
 
+  .errorMessage {
+    padding: 12px 14px;
+    border-radius: 8px;
+    color: #b91c1c;
+    background: #fee2e2;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
   button,
   form a {
     height: 50px;
@@ -92,6 +102,11 @@ export const StyledLogin = styled.main`
     margin-top: 8px;
     color: #ffffff;
     background: #2563eb;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    background: #93c5fd;
   }
 
   form a {
