@@ -5,20 +5,26 @@ import StyledHeader, {
   StyledLogo,
 } from '@/components/Header/StyledHeader';
 import { ROUTES } from '@/consts/route';
+import { useAuth } from '@/entities/auth/model/AuthProvider';
 
 type NavLinkItem = {
   href: string;
   label: string;
 };
 
-const linkList: NavLinkItem[] = [
-  { href: ROUTES.HOME, label: '홈' },
-  { href: ROUTES.BOARD, label: '게시판' },
-  { href: ROUTES.LOGIN, label: '로그인' },
-  { href: ROUTES.SIGN_UP, label: '회원가입' },
-];
-
 export default function Header() {
+  const { isLoggedIn, signOut } = useAuth();
+  const linkList: NavLinkItem[] = [
+    { href: ROUTES.HOME, label: '홈' },
+    { href: ROUTES.BOARD, label: '게시판' },
+    ...(!isLoggedIn
+      ? [
+          { href: ROUTES.LOGIN, label: '로그인' },
+          { href: ROUTES.SIGN_UP, label: '회원가입' },
+        ]
+      : []),
+  ];
+
   return (
     <StyledHeader>
       <StyledNav>
@@ -32,6 +38,13 @@ export default function Header() {
               <a href={href}>{label}</a>
             </StyledLi>
           ))}
+          {isLoggedIn && (
+            <StyledLi>
+              <button type="button" onClick={signOut}>
+                로그아웃
+              </button>
+            </StyledLi>
+          )}
         </StyledUl>
       </StyledNav>
     </StyledHeader>

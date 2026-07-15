@@ -35,16 +35,23 @@ const StyledLi = styled.li`
   font-weight: 600;
   color: #1e3a8a;
 
-  a {
+  a,
+  button {
     display: block;
     padding: 10px 14px;
     border-radius: 8px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
     transition:
       color 0.2s ease,
       background-color 0.2s ease;
   }
 
-  a:hover {
+  a:hover,
+  button:hover {
     color: #ffffff;
     background: #2563eb;
   }

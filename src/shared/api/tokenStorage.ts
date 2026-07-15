@@ -24,6 +24,8 @@ export const getAuthorizationHeader = () => {
   return `${getTokenType()} ${accessToken}`;
 };
 
+export const hasAuthSession = () => Boolean(getAccessToken() && getRefreshToken());
+
 export const saveAuthSession = ({ accessToken, refreshToken, tokenType }: AuthSession) => {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);

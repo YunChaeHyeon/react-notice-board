@@ -43,8 +43,8 @@ export default function SignUp() {
         password,
       });
 
-      setSuccessMessage('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.');
-      window.setTimeout(() => navigate(ROUTES.LOGIN), 700);
+      setSuccessMessage('회원가입이 완료되었습니다.');
+      window.setTimeout(() => navigate(ROUTES.LOGIN), 1500);
     } catch (error) {
       setErrorMessage(
         isApiError(error) ? error.message : '회원가입 중 알 수 없는 오류가 발생했습니다.',

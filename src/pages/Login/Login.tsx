@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/consts/route';
 import { login } from '@/entities/auth/api';
+import { useAuth } from '@/entities/auth/model/AuthProvider';
 import { isApiError } from '@/shared/api/types';
-import { saveAuthSession } from '@/shared/api/tokenStorage';
 import { StyledLogin } from '@/pages/Login/StyledLogin';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -30,7 +31,7 @@ export default function Login() {
     try {
       const session = await login({ email, password });
 
-      saveAuthSession(session);
+      signIn(session);
       navigate(ROUTES.BOARD);
     } catch (error) {
       setErrorMessage(
