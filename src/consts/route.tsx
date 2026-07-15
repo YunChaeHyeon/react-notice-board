@@ -3,4 +3,6 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGN_UP: '/signup',
   BOARD: '/board',
+  BOARD_WRITE: '/board/write',
+  BOARD_DETAIL: (postId: string) => `/board/${postId}`,
 } as const;

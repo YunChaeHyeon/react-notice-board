@@ -1,35 +1,8 @@
-import { StyledBoard } from '@/pages/Board/StyledBoard';
+import { Link } from 'react-router-dom';
 
-const posts = [
-  {
-    category: '공지',
-    title: '게시판 서비스 오픈 안내',
-    writer: '관리자',
-    date: '2026.07.14',
-    views: 248,
-  },
-  {
-    category: '업데이트',
-    title: '댓글과 검색 기능 준비 현황',
-    writer: '운영팀',
-    date: '2026.07.13',
-    views: 132,
-  },
-  {
-    category: '자유',
-    title: '첫 화면에서 보고 싶은 정보 제안',
-    writer: 'blueuser',
-    date: '2026.07.12',
-    views: 87,
-  },
-  {
-    category: '문의',
-    title: '회원 전용 게시글 권한 설정 문의',
-    writer: 'guest01',
-    date: '2026.07.11',
-    views: 64,
-  },
-];
+import { ROUTES } from '@/consts/route';
+import { boardPosts } from '@/entities/board/model/posts';
+import { StyledBoard } from '@/pages/Board/StyledBoard';
 
 export default function Board() {
   return (
@@ -40,7 +13,9 @@ export default function Board() {
           <h2>게시판</h2>
           <span>공지와 자유글을 빠르게 확인하고 관리하는 공간입니다.</span>
         </div>
-        <button type="button">글쓰기</button>
+        <Link className="writeLink" to={ROUTES.BOARD_WRITE}>
+          글쓰기
+        </Link>
       </section>
 
       <section className="toolbar">
@@ -54,8 +29,8 @@ export default function Board() {
       </section>
 
       <section className="postList" aria-label="게시글 목록">
-        {posts.map((post) => (
-          <article key={post.title}>
+        {boardPosts.map((post) => (
+          <Link className="postItem" key={post.id} to={ROUTES.BOARD_DETAIL(post.id)}>
             <span className="category">{post.category}</span>
             <strong>{post.title}</strong>
             <div>
@@ -63,7 +38,7 @@ export default function Board() {
               <span>{post.date}</span>
               <span>조회 {post.views}</span>
             </div>
-          </article>
+          </Link>
         ))}
       </section>
     </StyledBoard>
