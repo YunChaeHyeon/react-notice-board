@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/consts/route';
 import { login } from '@/entities/auth/api';
@@ -10,6 +10,7 @@ import { StyledLogin } from '@/pages/Login/StyledLogin';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +18,16 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isValid = email.trim().length > 0 && password.length >= 8;
+  const redirectPath =
+    typeof location.state === 'object' &&
+    location.state !== null &&
+    'from' in location.state &&
+    typeof location.state.from === 'object' &&
+    location.state.from !== null &&
+    'pathname' in location.state.from &&
+    typeof location.state.from.pathname === 'string'
+      ? location.state.from.pathname
+      : ROUTES.BOARD;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,7 +43,7 @@ export default function Login() {
       const session = await login({ email, password });
 
       signIn(session);
-      navigate(ROUTES.BOARD);
+      navigate(redirectPath, { replace: true });
     } catch (error) {
       setErrorMessage(
         isApiError(error) ? error.message : '로그인 중 알 수 없는 오류가 발생했습니다.',
@@ -82,7 +93,6 @@ export default function Login() {
           <a className="outlineLink" href={ROUTES.SIGN_UP}>
             계정 만들기
           </a>
-          <a href={ROUTES.BOARD}>비회원으로 게시판 둘러보기</a>
         </form>
       </section>
     </StyledLogin>

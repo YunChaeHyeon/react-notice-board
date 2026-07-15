@@ -1,5 +1,6 @@
 import { StyledHome } from '@/pages/Home/StyledHome';
 import { ROUTES } from '@/consts/route';
+import { useAuth } from '@/entities/auth/model/AuthProvider';
 
 const boardHighlights = [
   '공지, 자유글, 문의를 한 곳에서 관리',
@@ -8,6 +9,8 @@ const boardHighlights = [
 ];
 
 export default function Home() {
+  const { isLoggedIn } = useAuth();
+
   return (
     <StyledHome>
       <section className="hero">
@@ -20,12 +23,15 @@ export default function Home() {
             않도록 구성했습니다.
           </p>
           <div className="actions">
-            <a className="primary" href={ROUTES.BOARD}>
-              게시판 보기
-            </a>
-            <a className="secondary" href={ROUTES.LOGIN}>
-              로그인
-            </a>
+            {isLoggedIn ? (
+              <a className="primary" href={ROUTES.BOARD}>
+                게시판 보기
+              </a>
+            ) : (
+              <a className="secondary" href={ROUTES.LOGIN}>
+                로그인
+              </a>
+            )}
           </div>
         </div>
 

@@ -35,6 +35,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
           if (refreshToken) {
             await logout({ refreshToken });
           }
+        } catch {
+          // apiClient shows the server resultMessage as a toast.
         } finally {
           clearAuthSession();
           setIsLoggedIn(false);

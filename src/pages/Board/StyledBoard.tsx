@@ -64,7 +64,7 @@ export const StyledBoard = styled.main`
   .toolbar {
     margin-top: 20px;
     display: grid;
-    grid-template-columns: 1fr 160px;
+    grid-template-columns: 160px 1fr;
     gap: 12px;
   }
 
@@ -93,6 +93,23 @@ export const StyledBoard = styled.main`
     margin-top: 20px;
     display: grid;
     gap: 12px;
+  }
+
+  .listState {
+    padding: 36px 24px;
+    border: 1px solid rgba(37, 99, 235, 0.14);
+    border-radius: 8px;
+    color: #64748b;
+    background: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .listState.error {
+    color: #b91c1c;
+    background: #fee2e2;
+    border-color: #fecaca;
   }
 
   .postItem {

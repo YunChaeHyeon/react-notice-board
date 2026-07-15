@@ -7,6 +7,7 @@ import Login from '@/pages/Login/Login';
 import SignUp from '@/pages/SignUp/SignUp';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from '@/Route/Layout';
+import ProtectedRoute from '@/Route/ProtectedRoute';
 
 export default function Router() {
   return (
@@ -16,9 +17,11 @@ export default function Router() {
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.SIGN_UP} element={<SignUp />} />
-          <Route path={ROUTES.BOARD} element={<Board />} />
-          <Route path={ROUTES.BOARD_WRITE} element={<BoardWrite />} />
-          <Route path="/board/:postId" element={<BoardDetail />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path={ROUTES.BOARD} element={<Board />} />
+            <Route path={ROUTES.BOARD_WRITE} element={<BoardWrite />} />
+            <Route path="/board/:postId" element={<BoardDetail />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

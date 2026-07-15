@@ -6,10 +6,14 @@ import {
   saveAccessToken,
 } from '@/shared/api/tokenStorage';
 import type { BaseModel } from '@/shared/model/baseModel';
+import { showErrorToast } from '@/shared/ui/toast';
 
 const DEFAULT_API_BASE_URL = '';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 const REISSUE_ENDPOINT = '/api/v0/members/reissue';
+const UNAUTHORIZED_RESULT_CODE = 401;
+
+let reissuePromise: Promise<boolean> | null = null;
 
 type RequestOptions = Omit<RequestInit, 'body'> & {
   auth?: boolean;
@@ -35,7 +39,25 @@ const parseJson = async <T>(response: Response): Promise<BaseModel<T> | null> =>
   return JSON.parse(text) as BaseModel<T>;
 };
 
-const reissueAccessToken = async () => {
+const getErrorMessage = <T>(responseBody: BaseModel<T> | null) => {
+  return responseBody?.resultMessage ?? '서버와 통신 중 오류가 발생했습니다.';
+};
+
+const throwApiError = <T>(responseBody: BaseModel<T> | null, status: number): never => {
+  const message = getErrorMessage(responseBody);
+
+  if (responseBody?.resultMessage) {
+    showErrorToast(responseBody.resultMessage);
+  }
+
+  throw new ApiError(message, responseBody?.resultCode ?? status, responseBody?.data);
+};
+
+const isUnauthorizedResponse = <T>(response: Response, responseBody: BaseModel<T> | null) => {
+  return response.status === 401 || responseBody?.resultCode === UNAUTHORIZED_RESULT_CODE;
+};
+
+const requestReissueAccessToken = async () => {
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
@@ -52,12 +74,24 @@ const reissueAccessToken = async () => {
   const body = await parseJson<{ accessToken: string; tokenType: string }>(response);
 
   if (!response.ok || !body || body.resultCode !== 200) {
+    if (body?.resultMessage) {
+      showErrorToast(body.resultMessage);
+    }
+
     clearAuthSession();
     return false;
   }
 
   saveAccessToken(body.data.accessToken, body.data.tokenType);
   return true;
+};
+
+const reissueAccessToken = () => {
+  reissuePromise ??= requestReissueAccessToken().finally(() => {
+    reissuePromise = null;
+  });
+
+  return reissuePromise;
 };
 
 const request = async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
@@ -79,7 +113,9 @@ const request = async <T>(endpoint: string, options: RequestOptions = {}): Promi
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
-  if (response.status === 401 && auth && retryOnUnauthorized) {
+  const responseBody = await parseJson<T>(response);
+
+  if (isUnauthorizedResponse(response, responseBody) && auth && retryOnUnauthorized) {
     const reissued = await reissueAccessToken();
 
     if (reissued) {
@@ -87,21 +123,21 @@ const request = async <T>(endpoint: string, options: RequestOptions = {}): Promi
     }
   }
 
-  const responseBody = await parseJson<T>(response);
-
-  if (!response.ok || !responseBody) {
-    throw new ApiError(
-      responseBody?.resultMessage ?? '서버와 통신 중 오류가 발생했습니다.',
-      responseBody?.resultCode ?? response.status,
-      responseBody?.data,
-    );
+  if (!responseBody) {
+    throwApiError(responseBody, response.status);
   }
 
-  if (responseBody.resultCode !== 200) {
-    throw new ApiError(responseBody.resultMessage, responseBody.resultCode, responseBody.data);
+  const parsedBody = responseBody as BaseModel<T>;
+
+  if (!response.ok) {
+    throwApiError(parsedBody, response.status);
   }
 
-  return responseBody.data;
+  if (parsedBody.resultCode !== 200) {
+    throwApiError(parsedBody, response.status);
+  }
+
+  return parsedBody.data;
 };
 
 export const apiClient = {
