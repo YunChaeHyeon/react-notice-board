@@ -1,13 +1,19 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 
+import { logout } from '@/entities/auth/api';
 import type { AuthSession } from '@/shared/api/tokenStorage';
-import { clearAuthSession, hasAuthSession, saveAuthSession } from '@/shared/api/tokenStorage';
+import {
+  clearAuthSession,
+  getRefreshToken,
+  hasAuthSession,
+  saveAuthSession,
+} from '@/shared/api/tokenStorage';
 
 type AuthContextValue = {
   isLoggedIn: boolean;
   signIn: (session: AuthSession) => void;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -22,9 +28,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
         saveAuthSession(session);
         setIsLoggedIn(true);
       },
-      signOut: () => {
-        clearAuthSession();
-        setIsLoggedIn(false);
+      signOut: async () => {
+        const refreshToken = getRefreshToken();
+
+        try {
+          if (refreshToken) {
+            await logout({ refreshToken });
+          }
+        } finally {
+          clearAuthSession();
+          setIsLoggedIn(false);
+        }
       },
     }),
     [isLoggedIn],

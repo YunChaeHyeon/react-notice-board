@@ -2,6 +2,8 @@ import AUTH_API_ENDPOINTS from '@/entities/auth/api/endpoints';
 import type {
   LoginReq,
   LoginRes,
+  LogoutReq,
+  LogoutRes,
   ReissueReq,
   ReissueRes,
   SignUpReq,
@@ -21,4 +23,8 @@ export const signUp = async (data: SignUpReq): Promise<SignUpRes> => {
 
 export const reissue = async (data: ReissueReq): Promise<ReissueRes> => {
   return apiClient.post<ReissueRes>(endpoints.reissue, data, { auth: false });
+};
+
+export const logout = async (data: LogoutReq): Promise<LogoutRes> => {
+  return apiClient.post<LogoutRes>(endpoints.logout, data);
 };

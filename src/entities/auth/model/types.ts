@@ -25,3 +25,9 @@ export type ReissueRes = {
   accessToken: string;
   tokenType: string;
 };
+
+export type LogoutReq = {
+  refreshToken: string;
+};
+
+export type LogoutRes = Record<string, never>;
