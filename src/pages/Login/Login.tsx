@@ -78,6 +78,9 @@ export default function Login() {
           <button type="submit" disabled={!isValid || isSubmitting}>
             {isSubmitting ? '로그인 중...' : '로그인'}
           </button>
+          <a className="outlineLink" href={ROUTES.SIGN_UP}>
+            계정 만들기
+          </a>
           <a href={ROUTES.BOARD}>비회원으로 게시판 둘러보기</a>
         </form>
       </section>

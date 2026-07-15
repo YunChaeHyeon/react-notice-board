@@ -9,6 +9,14 @@ export type LoginRes = {
   tokenType: string;
 };
 
+export type SignUpReq = {
+  email: string;
+  nickName: string;
+  password: string;
+};
+
+export type SignUpRes = Record<string, never>;
+
 export type ReissueReq = {
   refreshToken: string;
 };

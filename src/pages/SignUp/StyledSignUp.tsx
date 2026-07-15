@@ -1,18 +1,18 @@
 import { HEADER_HEIGHT } from '@/consts/styles';
 import styled from 'styled-components';
 
-export const StyledLogin = styled.main`
+export const StyledSignUp = styled.main`
   min-height: 100vh;
-  padding: ${HEADER_HEIGHT + 64}px 24px 64px;
+  padding: ${HEADER_HEIGHT + 48}px 24px 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(145deg, #f8fbff 0%, #dbeafe 100%);
 
-  .loginPanel {
+  .signUpPanel {
     width: min(960px, 100%);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0.9fr 1.1fr;
     overflow: hidden;
     border-radius: 8px;
     background: #ffffff;
@@ -23,7 +23,7 @@ export const StyledLogin = styled.main`
   .copy {
     padding: 56px;
     color: #ffffff;
-    background: linear-gradient(160deg, #1d4ed8 0%, #2563eb 58%, #60a5fa 100%);
+    background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 58%, #60a5fa 100%);
   }
 
   .copy p {
@@ -49,10 +49,10 @@ export const StyledLogin = styled.main`
   }
 
   form {
-    padding: 56px;
+    padding: 48px 56px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
   }
 
   label {
@@ -79,14 +79,23 @@ export const StyledLogin = styled.main`
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
   }
 
-  .errorMessage {
+  .errorMessage,
+  .successMessage {
     padding: 12px 14px;
     border-radius: 8px;
-    color: #b91c1c;
-    background: #fee2e2;
     font-size: 14px;
     font-weight: 700;
     line-height: 1.5;
+  }
+
+  .errorMessage {
+    color: #b91c1c;
+    background: #fee2e2;
+  }
+
+  .successMessage {
+    color: #166534;
+    background: #dcfce7;
   }
 
   button,
@@ -117,14 +126,8 @@ export const StyledLogin = styled.main`
     background: #eff6ff;
   }
 
-  form a.outlineLink {
-    color: #2563eb;
-    background: #ffffff;
-    border: 1px solid #bfdbfe;
-  }
-
   @media (max-width: 760px) {
-    .loginPanel {
+    .signUpPanel {
       grid-template-columns: 1fr;
     }
 

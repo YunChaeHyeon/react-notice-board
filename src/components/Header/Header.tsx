@@ -15,6 +15,7 @@ const linkList: NavLinkItem[] = [
   { href: ROUTES.HOME, label: '홈' },
   { href: ROUTES.BOARD, label: '게시판' },
   { href: ROUTES.LOGIN, label: '로그인' },
+  { href: ROUTES.SIGN_UP, label: '회원가입' },
 ];
 
 export default function Header() {
