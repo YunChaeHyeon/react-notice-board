@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 
 import { logout } from '@/entities/auth/api';
@@ -8,6 +8,7 @@ import {
   getRefreshToken,
   hasAuthSession,
   saveAuthSession,
+  subscribeAuthSessionCleared,
 } from '@/shared/api/tokenStorage';
 
 type AuthContextValue = {
@@ -20,6 +21,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [isLoggedIn, setIsLoggedIn] = useState(() => hasAuthSession());
+
+  useEffect(() => {
+    return subscribeAuthSessionCleared(() => {
+      setIsLoggedIn(false);
+    });
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({

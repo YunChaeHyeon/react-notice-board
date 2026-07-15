@@ -278,6 +278,16 @@ export const StyledBoard = styled.main`
     font-weight: 900;
   }
 
+  .formError {
+    padding: 12px 14px;
+    border-radius: 8px;
+    color: #b91c1c;
+    background: #fee2e2;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
   textarea {
     min-height: 260px;
     padding: 14px;

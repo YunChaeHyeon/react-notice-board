@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 
 import { ROUTES } from '@/consts/route';
 import { getPostList } from '@/entities/board/api';
-import type { PostCategory, PostListItem } from '@/entities/board/model/types';
+import {
+  POST_CATEGORY_LABELS,
+  POST_CATEGORY_OPTIONS,
+  type PostCategory,
+  type PostListItem,
+} from '@/entities/board/model/types';
 import { isApiError } from '@/shared/api/types';
 import { StyledBoard } from '@/pages/Board/StyledBoard';
 
@@ -12,20 +17,10 @@ type CategoryOption = {
   value: PostCategory | 'ALL';
 };
 
-const categoryOptions: CategoryOption[] = [
+const categoryOptions = [
   { label: '전체', value: 'ALL' },
-  { label: '공지', value: 'NOTICE' },
-  { label: '자유', value: 'FREE' },
-  { label: '문의', value: 'INQUIRY' },
-  { label: '질문', value: 'QUESTION' },
-];
-
-const categoryLabels: Record<PostCategory, string> = {
-  NOTICE: '공지',
-  FREE: '자유',
-  INQUIRY: '문의',
-  QUESTION: '질문',
-};
+  ...POST_CATEGORY_OPTIONS,
+] as const satisfies readonly CategoryOption[];
 
 const formatDate = (date: string) => {
   const parsedDate = new Date(date);
@@ -139,7 +134,7 @@ export default function Board() {
           !errorMessage &&
           posts.map((post) => (
             <Link className="postItem" key={post.id} to={ROUTES.BOARD_DETAIL(String(post.id))}>
-              <span className="category">{categoryLabels[post.category]}</span>
+              <span className="category">{POST_CATEGORY_LABELS[post.category]}</span>
               <strong>{post.title}</strong>
               <div>
                 <span>{post.authorNickName}</span>

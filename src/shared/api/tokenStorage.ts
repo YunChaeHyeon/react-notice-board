@@ -1,6 +1,7 @@
 const ACCESS_TOKEN_KEY = 'blue-board-access-token';
 const REFRESH_TOKEN_KEY = 'blue-board-refresh-token';
 const TOKEN_TYPE_KEY = 'blue-board-token-type';
+const AUTH_SESSION_CLEARED_EVENT_NAME = 'blue-board-auth-session-cleared';
 
 export type AuthSession = {
   accessToken: string;
@@ -41,4 +42,13 @@ export const clearAuthSession = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(TOKEN_TYPE_KEY);
+  window.dispatchEvent(new Event(AUTH_SESSION_CLEARED_EVENT_NAME));
+};
+
+export const subscribeAuthSessionCleared = (listener: () => void) => {
+  window.addEventListener(AUTH_SESSION_CLEARED_EVENT_NAME, listener);
+
+  return () => {
+    window.removeEventListener(AUTH_SESSION_CLEARED_EVENT_NAME, listener);
+  };
 };
