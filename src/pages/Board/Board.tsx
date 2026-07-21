@@ -61,12 +61,15 @@ export default function Board() {
 
         if (!ignore) {
           setPosts(postList);
+          sessionStorage.setItem('boardPosts', JSON.stringify(postList));
         }
       } catch (error) {
         if (!ignore) {
           setPosts([]);
           setErrorMessage(
-            isApiError(error) ? error.message : '게시글 목록을 불러오지 못했습니다.',
+            isApiError(error)
+              ? error.message
+              : '게시글 목록을 불러오지 못했습니다.',
           );
         }
       } finally {
@@ -103,7 +106,9 @@ export default function Board() {
       <section className="toolbar">
         <select
           value={category}
-          onChange={(event) => setCategory(event.target.value as CategoryOption['value'])}
+          onChange={(event) =>
+            setCategory(event.target.value as CategoryOption['value'])
+          }
         >
           {categoryOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -126,15 +131,24 @@ export default function Board() {
 
       <section className="postList" aria-label="게시글 목록">
         {isLoading && <p className="listState">게시글을 불러오는 중입니다.</p>}
-        {!isLoading && errorMessage && <p className="listState error">{errorMessage}</p>}
+        {!isLoading && errorMessage && (
+          <p className="listState error">{errorMessage}</p>
+        )}
         {!isLoading && !errorMessage && posts.length === 0 && (
           <p className="listState">게시글이 없습니다.</p>
         )}
         {!isLoading &&
           !errorMessage &&
           posts.map((post) => (
-            <Link className="postItem" key={post.id} to={ROUTES.BOARD_DETAIL(String(post.id))}>
-              <span className="category">{POST_CATEGORY_LABELS[post.category]}</span>
+            <Link
+              className="postItem"
+              key={post.id}
+              to={ROUTES.BOARD_DETAIL(String(post.id))}
+              state={{ post }}
+            >
+              <span className="category">
+                {POST_CATEGORY_LABELS[post.category]}
+              </span>
               <strong>{post.title}</strong>
               <div>
                 <span>{post.authorNickName}</span>

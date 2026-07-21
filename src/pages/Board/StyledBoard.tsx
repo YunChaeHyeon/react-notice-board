@@ -210,6 +210,7 @@ export const StyledBoard = styled.main`
   }
 
   .detailActions a,
+  .detailActions button,
   .formActions a,
   .formActions button,
   .emptyState a {
@@ -225,6 +226,7 @@ export const StyledBoard = styled.main`
   }
 
   .detailActions a,
+  .detailActions button,
   .formActions button,
   .emptyState a {
     color: #ffffff;
@@ -235,6 +237,18 @@ export const StyledBoard = styled.main`
   .formActions a {
     color: #1d4ed8;
     background: #eff6ff;
+  }
+
+  .detailActions .deleteButton {
+    border: 0;
+    color: #ffffff;
+    background: #dc2626;
+    cursor: pointer;
+  }
+
+  .detailActions .deleteButton:disabled {
+    cursor: not-allowed;
+    background: #fca5a5;
   }
 
   .formActions button:disabled {

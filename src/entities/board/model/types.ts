@@ -22,6 +22,7 @@ export type PostListReq = {
 export type PostListItem = {
   id: number;
   title: string;
+  content: string;
   category: PostCategory;
   authorNickName: string;
   viewCount: number;
@@ -35,5 +36,9 @@ export type PostCreateReq = {
 };
 
 export type PostCreateRes = {
+  postId: number;
+};
+
+export type PostMutationRes = {
   postId: number;
 };

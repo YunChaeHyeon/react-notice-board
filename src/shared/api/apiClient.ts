@@ -12,6 +12,11 @@ const DEFAULT_API_BASE_URL = '';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 const REISSUE_ENDPOINT = '/api/v0/members/reissue';
 const UNAUTHORIZED_RESULT_CODE = 401;
+const LOGIN_REQUIRED_MESSAGE = '로그인을 다시 해주세요.';
+const PRIVATE_AUTH_ERROR_MESSAGES = new Set([
+  '액세스 토큰이 만료되었습니다.',
+  '리프레시 토큰이 올바르지 않습니다.',
+]);
 
 let reissuePromise: Promise<boolean> | null = null;
 
@@ -29,7 +34,9 @@ const createUrl = (endpoint: string) => {
   return `${API_BASE_URL}${endpoint}`;
 };
 
-const parseJson = async <T>(response: Response): Promise<BaseModel<T> | null> => {
+const parseJson = async <T>(
+  response: Response,
+): Promise<BaseModel<T> | null> => {
   const text = await response.text();
 
   if (!text) {
@@ -40,50 +47,76 @@ const parseJson = async <T>(response: Response): Promise<BaseModel<T> | null> =>
 };
 
 const getErrorMessage = <T>(responseBody: BaseModel<T> | null) => {
-  return responseBody?.resultMessage ?? '서버와 통신 중 오류가 발생했습니다.';
+  const message = responseBody?.resultMessage;
+
+  if (message && PRIVATE_AUTH_ERROR_MESSAGES.has(message)) {
+    return LOGIN_REQUIRED_MESSAGE;
+  }
+
+  return message ?? '서버와 통신 중 오류가 발생했습니다.';
 };
 
-const throwApiError = <T>(responseBody: BaseModel<T> | null, status: number): never => {
+const throwApiError = <T>(
+  responseBody: BaseModel<T> | null,
+  status: number,
+): never => {
   const message = getErrorMessage(responseBody);
 
   if (responseBody?.resultMessage) {
-    showErrorToast(responseBody.resultMessage);
+    showErrorToast(message);
   }
 
-  throw new ApiError(message, responseBody?.resultCode ?? status, responseBody?.data);
+  throw new ApiError(
+    message,
+    responseBody?.resultCode ?? status,
+    responseBody?.data,
+  );
 };
 
-const isUnauthorizedResponse = <T>(response: Response, responseBody: BaseModel<T> | null) => {
-  return response.status === 401 || responseBody?.resultCode === UNAUTHORIZED_RESULT_CODE;
+const isUnauthorizedResponse = <T>(
+  response: Response,
+  responseBody: BaseModel<T> | null,
+) => {
+  return (
+    response.status === 401 ||
+    responseBody?.resultCode === UNAUTHORIZED_RESULT_CODE
+  );
 };
 
 const requestReissueAccessToken = async () => {
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
+    clearAuthSession();
+    showErrorToast(LOGIN_REQUIRED_MESSAGE);
     return false;
   }
 
-  const response = await fetch(createUrl(REISSUE_ENDPOINT), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken }),
-  });
-  const body = await parseJson<{ accessToken: string; tokenType: string }>(response);
+  try {
+    const response = await fetch(createUrl(REISSUE_ENDPOINT), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+    const body = await parseJson<{ accessToken: string; tokenType: string }>(
+      response,
+    );
 
-  if (!response.ok || !body || body.resultCode !== 200) {
-    if (body?.resultMessage) {
-      showErrorToast(body.resultMessage);
+    if (!response.ok || !body || body.resultCode !== 200) {
+      clearAuthSession();
+      showErrorToast(LOGIN_REQUIRED_MESSAGE);
+      return false;
     }
 
+    saveAccessToken(body.data.accessToken, body.data.tokenType);
+    return true;
+  } catch {
     clearAuthSession();
+    showErrorToast(LOGIN_REQUIRED_MESSAGE);
     return false;
   }
-
-  saveAccessToken(body.data.accessToken, body.data.tokenType);
-  return true;
 };
 
 const reissueAccessToken = () => {
@@ -94,8 +127,17 @@ const reissueAccessToken = () => {
   return reissuePromise;
 };
 
-const request = async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
-  const { auth = true, body, headers, retryOnUnauthorized = true, ...init } = options;
+const request = async <T>(
+  endpoint: string,
+  options: RequestOptions = {},
+): Promise<T> => {
+  const {
+    auth = true,
+    body,
+    headers,
+    retryOnUnauthorized = true,
+    ...init
+  } = options;
   const authorization = auth ? getAuthorizationHeader() : null;
   const requestHeaders = new Headers(headers);
 
@@ -115,12 +157,24 @@ const request = async <T>(endpoint: string, options: RequestOptions = {}): Promi
 
   const responseBody = await parseJson<T>(response);
 
-  if (isUnauthorizedResponse(response, responseBody) && auth && retryOnUnauthorized) {
+  if (
+    isUnauthorizedResponse(response, responseBody) &&
+    auth &&
+    retryOnUnauthorized
+  ) {
     const reissued = await reissueAccessToken();
 
     if (reissued) {
       return request<T>(endpoint, { ...options, retryOnUnauthorized: false });
     }
+
+    throw new ApiError(LOGIN_REQUIRED_MESSAGE, UNAUTHORIZED_RESULT_CODE, null);
+  }
+
+  if (isUnauthorizedResponse(response, responseBody) && auth) {
+    clearAuthSession();
+    showErrorToast(LOGIN_REQUIRED_MESSAGE);
+    throw new ApiError(LOGIN_REQUIRED_MESSAGE, UNAUTHORIZED_RESULT_CODE, null);
   }
 
   if (!responseBody) {

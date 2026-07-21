@@ -21,6 +21,7 @@ export default function Router() {
             <Route path={ROUTES.BOARD} element={<Board />} />
             <Route path={ROUTES.BOARD_WRITE} element={<BoardWrite />} />
             <Route path="/board/:postId" element={<BoardDetail />} />
+            <Route path="/board/:postId/edit" element={<BoardWrite />} />
           </Route>
         </Route>
       </Routes>

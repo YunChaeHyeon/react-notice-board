@@ -4,6 +4,7 @@ import type {
   PostCreateRes,
   PostListItem,
   PostListReq,
+  PostMutationRes,
 } from '@/entities/board/model/types';
 import { apiClient } from '@/shared/api/apiClient';
 
@@ -24,13 +25,33 @@ const createSearchParams = ({ title, category }: PostListReq) => {
   return params.toString();
 };
 
-export const getPostList = async (params: PostListReq = {}): Promise<PostListItem[]> => {
+export const getPostList = async (
+  params: PostListReq = {},
+): Promise<PostListItem[]> => {
   const searchParams = createSearchParams(params);
-  const endpoint = searchParams ? `${endpoints.list}?${searchParams}` : endpoints.list;
+  const endpoint = searchParams
+    ? `${endpoints.list}?${searchParams}`
+    : endpoints.list;
 
   return apiClient.get<PostListItem[]>(endpoint);
 };
 
-export const createPost = async (data: PostCreateReq): Promise<PostCreateRes> => {
+export const createPost = async (
+  data: PostCreateReq,
+): Promise<PostCreateRes> => {
   return apiClient.post<PostCreateRes>(endpoints.create, data);
+};
+
+export const updatePost = async (
+  postId: number,
+  data: PostCreateReq,
+): Promise<PostMutationRes> => {
+  return apiClient.post<PostMutationRes>(
+    `${endpoints.update}?postId=${postId}`,
+    data,
+  );
+};
+
+export const deletePost = async (postId: number): Promise<PostMutationRes> => {
+  return apiClient.post<PostMutationRes>(endpoints.delete, postId);
 };
