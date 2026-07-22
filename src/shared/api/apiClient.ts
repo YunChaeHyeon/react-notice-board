@@ -12,7 +12,7 @@ const DEFAULT_API_BASE_URL = '';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 const REISSUE_ENDPOINT = '/api/v0/members/reissue';
 const UNAUTHORIZED_RESULT_CODE = 401;
-const LOGIN_REQUIRED_MESSAGE = '로그인을 다시 해주세요.';
+const LOGIN_REQUIRED_MESSAGE = '세션이 만료되었습니다. 다시 로그인해 주세요.';
 const PRIVATE_AUTH_ERROR_MESSAGES = new Set([
   '액세스 토큰이 만료되었습니다.',
   '리프레시 토큰이 올바르지 않습니다.',
